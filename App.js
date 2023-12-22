@@ -5,10 +5,27 @@ import {
   View,
   TouchableOpacity,
   TouchableHighlight,
+  TextInput,
 } from "react-native";
 import { theme } from "./colors";
+import { useState } from "react";
 
 export default function App() {
+  const [working, setWorking] = useState(true);
+  const [text, setText] = useState("");
+
+  const travel = () => {
+    setWorking(false);
+  };
+
+  const work = () => {
+    setWorking(true);
+  };
+
+  const onChangeText = (event) => {
+    setText(event);
+  };
+
   // NOTE TouchableOpacity는 터치했을 때의 opacity를 설정할 수 있음
   // NOTE TouchableHighlight는 터치했을 때의 효과를 좀 더 다양하게 (ex. 배경색) 설정할 수 있음
   // NOTE TouchableWithoutFeedback은 터치했을 때 UI 변화 없이 onPress만 설정할 수 있음
@@ -18,12 +35,28 @@ export default function App() {
       <Text>Open up App.js to start working on your app!</Text>
       <StatusBar style="auto" />
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Text style={styles.btnText}>Work</Text>
+        <TouchableOpacity onPress={work}>
+          <Text
+            style={{ ...styles.btnText, color: working ? "white" : theme.gray }}
+          >
+            Work
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => console.log("pressed")}>
-          <Text style={styles.btnText}>Travel</Text>
+        <TouchableOpacity onPress={travel}>
+          <Text
+            style={{ ...styles.btnText, color: working ? theme.gray : "white" }}
+          >
+            Travel
+          </Text>
         </TouchableOpacity>
+      </View>
+      <View>
+        <TextInput
+          style={styles.input}
+          placeholder={working ? "Add a To Do" : "Where do you want to go?"}
+          onChangeText={onChangeText}
+          value={text}
+        />
       </View>
     </View>
   );
@@ -45,5 +78,13 @@ const styles = StyleSheet.create({
     color: theme.grey,
     fontSize: 44,
     fontWeight: "600",
+  },
+  input: {
+    backgroundColor: "white",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    marginTop: 20,
+    fontSize: 18,
   },
 });
