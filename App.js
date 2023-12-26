@@ -5,6 +5,7 @@ import {
   View,
   TouchableOpacity,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { theme } from "./colors";
 import { useState } from "react";
@@ -31,9 +32,10 @@ export default function App() {
       return;
     }
 
-    const newToDos = Object.assign({}, toDos, {
-      [Date.now()]: { text, work: working },
-    });
+    // const newToDos = Object.assign({}, toDos, {
+    //   [Date.now()]: { text, work: working },
+    // });
+    const newToDos = { ...toDos, [Date.now()]: { text, work: working } };
     setToDos(newToDos);
     setText("");
   };
@@ -61,16 +63,21 @@ export default function App() {
           </Text>
         </TouchableOpacity>
       </View>
-      <View>
-        <TextInput
-          style={styles.input}
-          placeholder={working ? "Add a To Do" : "Where do you want to go?"}
-          onChangeText={onChangeText}
-          value={text}
-          onSubmitEditing={addToDo}
-          returnKeyType="done"
-        />
-      </View>
+      <TextInput
+        style={styles.input}
+        placeholder={working ? "Add a To Do" : "Where do you want to go?"}
+        onChangeText={onChangeText}
+        value={text}
+        onSubmitEditing={addToDo}
+        returnKeyType="done"
+      />
+      <ScrollView>
+        {Object.keys(toDos).map((key) => (
+          <View key={key} style={styles.toDo}>
+            <Text style={styles.toDoText}>{toDos[key].text}</Text>
+          </View>
+        ))}
+      </ScrollView>
     </View>
   );
 }
@@ -97,7 +104,19 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 30,
-    marginTop: 20,
+    marginVertical: 20,
     fontSize: 18,
+  },
+  toDo: {
+    backgroundColor: theme.gray,
+    marginBottom: 10,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    borderRadius: 15,
+  },
+  toDoText: {
+    color: "white",
+    fontSize: 20,
+    fontWeight: "500",
   },
 });
