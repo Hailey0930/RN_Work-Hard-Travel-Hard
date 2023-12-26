@@ -11,7 +11,7 @@ import {
 import { theme } from "./colors";
 import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 
 const STORAGE_KEY = "@toDos";
 const CATEGORY_KEY = "@category";
@@ -78,7 +78,10 @@ export default function App() {
     // const newToDos = Object.assign({}, toDos, {
     //   [Date.now()]: { text, work: working },
     // });
-    const newToDos = { ...toDos, [Date.now()]: { text, working } };
+    const newToDos = {
+      ...toDos,
+      [Date.now()]: { text, working, checked: false },
+    };
     setToDos(newToDos);
     await saveToDos(newToDos);
     setText("");
@@ -98,6 +101,15 @@ export default function App() {
         },
       },
     ]);
+  };
+
+  // NOTE 체크박스
+  const handleCheckbox = (id) => {
+    const newToDos = { ...toDos };
+    newToDos[id].checked = !newToDos[id].checked;
+
+    setToDos(newToDos);
+    saveToDos(newToDos);
   };
 
   // NOTE TouchableOpacity는 터치했을 때의 opacity를 설정할 수 있음
@@ -135,8 +147,41 @@ export default function App() {
         {Object.keys(toDos).map((key) =>
           toDos[key].working === working ? (
             <View key={key} style={styles.toDo}>
-              <Text style={styles.toDoText}>{toDos[key].text}</Text>
-              <TouchableOpacity onPress={() => deleteToDo(key)}>
+              <View style={styles.toDoContainer}>
+                <TouchableOpacity
+                  style={styles.checkbox}
+                  onPress={() => handleCheckbox(key)}
+                >
+                  {toDos[key].checked ? (
+                    <MaterialCommunityIcons
+                      name="checkbox-marked-outline"
+                      size={24}
+                      color="white"
+                    />
+                  ) : (
+                    <MaterialCommunityIcons
+                      name="checkbox-blank-outline"
+                      size={24}
+                      color="white"
+                    />
+                  )}
+                </TouchableOpacity>
+                <Text
+                  style={{
+                    ...styles.toDoText,
+                    textDecorationLine: toDos[key].checked
+                      ? "line-through"
+                      : "none",
+                    color: toDos[key].checked ? "#bdbdbd" : "white",
+                  }}
+                >
+                  {toDos[key].text}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => deleteToDo(key)}
+                style={styles.delete}
+              >
                 <FontAwesome name="trash-o" size={20} color="#bdbdbd" />
               </TouchableOpacity>
             </View>
@@ -182,9 +227,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
   },
+  toDoContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 4,
+  },
+  checkbox: {
+    marginRight: 10,
+  },
   toDoText: {
-    color: "white",
     fontSize: 20,
     fontWeight: "500",
+  },
+  delete: {
+    flex: 0.3,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
