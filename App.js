@@ -147,7 +147,7 @@ export default function App() {
   // NOTE Pressable은 TouchableOpacity의 확장 버전
   return (
     <View style={styles.container}>
-      <StatusBar style="auto" />
+      <StatusBar style="light" />
       <View style={styles.header}>
         <TouchableOpacity onPress={work}>
           <Text
