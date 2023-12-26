@@ -80,7 +80,7 @@ export default function App() {
     // });
     const newToDos = {
       ...toDos,
-      [Date.now()]: { text, working, checked: false },
+      [Date.now()]: { text, working, checked: false, editMode: false },
     };
     setToDos(newToDos);
     await saveToDos(newToDos);
@@ -107,6 +107,23 @@ export default function App() {
   const handleCheckbox = (id) => {
     const newToDos = { ...toDos };
     newToDos[id].checked = !newToDos[id].checked;
+
+    setToDos(newToDos);
+    saveToDos(newToDos);
+  };
+
+  // NOTE 수정모드
+  const handleEditMode = (id) => {
+    const newToDos = { ...toDos };
+    newToDos[id].editMode = !newToDos[id].editMode;
+
+    setToDos(newToDos);
+    saveToDos(newToDos);
+  };
+
+  const handleEditInput = (e, id) => {
+    const newToDos = { ...toDos };
+    newToDos[id].text = e;
 
     setToDos(newToDos);
     saveToDos(newToDos);
@@ -166,18 +183,38 @@ export default function App() {
                     />
                   )}
                 </TouchableOpacity>
-                <Text
-                  style={{
-                    ...styles.toDoText,
-                    textDecorationLine: toDos[key].checked
-                      ? "line-through"
-                      : "none",
-                    color: toDos[key].checked ? "#bdbdbd" : "white",
-                  }}
-                >
-                  {toDos[key].text}
-                </Text>
+                {toDos[key].editMode ? (
+                  <TextInput
+                    style={styles.editInput}
+                    value={toDos[key].text}
+                    onChangeText={(e) => handleEditInput(e, key)}
+                    onSubmitEditing={() => handleEditMode(key)}
+                    returnKeyType="done"
+                  />
+                ) : (
+                  <Text
+                    style={{
+                      ...styles.toDoText,
+                      textDecorationLine: toDos[key].checked
+                        ? "line-through"
+                        : "none",
+                      color: toDos[key].checked ? "#bdbdbd" : "white",
+                    }}
+                  >
+                    {toDos[key].text}
+                  </Text>
+                )}
               </View>
+              <TouchableOpacity
+                onPress={() => handleEditMode(key)}
+                style={styles.delete}
+              >
+                {toDos[key].editMode ? (
+                  <FontAwesome name="check" size={20} color="#bdbdbd" />
+                ) : (
+                  <FontAwesome name="edit" size={20} color="#bdbdbd" />
+                )}
+              </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => deleteToDo(key)}
                 style={styles.delete}
@@ -241,7 +278,15 @@ const styles = StyleSheet.create({
   },
   delete: {
     flex: 0.3,
-    justifyContent: "center",
+    justifyContent: "flex-end",
     alignItems: "center",
+    marginLeft: 15,
+  },
+  editInput: {
+    backgroundColor: "white",
+    fontSize: 18,
+    flex: 3,
+    paddingVertical: 7,
+    paddingHorizontal: 10,
   },
 });
