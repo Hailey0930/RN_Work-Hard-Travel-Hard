@@ -14,6 +14,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome } from "@expo/vector-icons";
 
 const STORAGE_KEY = "@toDos";
+const CATEGORY_KEY = "@category";
 
 export default function App() {
   const [working, setWorking] = useState(true);
@@ -22,16 +23,35 @@ export default function App() {
 
   useEffect(() => {
     loadToDos();
+    loadCategory();
   }, []);
+
+  // NOTE Working, Travel 카테고리 관리
+  const saveCategory = async (isWork) => {
+    try {
+      const stringValue = JSON.stringify(isWork);
+      await AsyncStorage.setItem(CATEGORY_KEY, stringValue);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const travel = () => {
     setWorking(false);
+    saveCategory(false);
   };
 
   const work = () => {
     setWorking(true);
+    saveCategory(true);
   };
 
+  const loadCategory = async () => {
+    const category = await AsyncStorage.getItem(CATEGORY_KEY);
+    category !== null ? setWorking(JSON.parse(category)) : null;
+  };
+
+  // NOTE input 관리
   const onChangeText = (event) => {
     setText(event);
   };
